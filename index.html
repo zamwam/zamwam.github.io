@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Zamwam</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+--bg:#06070b;
+--card:#11151d99;
+--border:rgba(255,255,255,.08);
+--text:#ffffff;
+--muted:#98a2b3;
+--accent:#4f8cff;
+--accent2:#7b5cff;
+--shadow:0 20px 60px rgba(0,0,0,.45);
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Inter,sans-serif;
+}
+
+body{
+background:
+radial-gradient(circle at top,#17325f 0%,transparent 35%),
+radial-gradient(circle at bottom right,#291b54 0%,transparent 35%),
+var(--bg);
+color:var(--text);
+overflow-x:hidden;
+}
+
+body::before{
+content:"";
+position:fixed;
+inset:0;
+background:
+linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),
+linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);
+background-size:60px 60px;
+pointer-events:none;
+}
+
+.container{
+width:min(1250px,92%);
+margin:auto;
+}
+
+.hero{
+min-height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
+}
+
+.hero h1{
+font-size:clamp(3rem,8vw,5.5rem);
+font-weight:800;
+letter-spacing:-2px;
+margin-bottom:15px;
+}
+
+.hero span{
+background:linear-gradient(90deg,var(--accent),#71b6ff,var(--accent2));
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+
+.hero p{
+max-width:700px;
+margin:auto;
+color:var(--muted);
+font-size:1.1rem;
+line-height:1.8;
+}
+
+.stats{
+display:flex;
+justify-content:center;
+gap:40px;
+margin-top:45px;
+flex-wrap:wrap;
+}
+
+.stat{
+text-align:center;
+}
+
+.stat h2{
+font-size:2rem;
+}
+
+.stat p{
+color:var(--muted);
+margin-top:6px;
+}
+
+.projects{
+padding:90px 0;
+}
+
+.section-title{
+font-size:2.2rem;
+margin-bottom:40px;
+font-weight:700;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+gap:28px;
+}
+
+.card{
+background:var(--card);
+backdrop-filter:blur(20px);
+border:1px solid var(--border);
+border-radius:22px;
+padding:30px;
+transition:.35s;
+display:flex;
+flex-direction:column;
+box-shadow:var(--shadow);
+}
+
+.card:hover{
+transform:translateY(-8px);
+border-color:rgba(79,140,255,.4);
+}
+
+.card h3{
+font-size:1.35rem;
+margin-bottom:14px;
+}
+
+.card p{
+color:var(--muted);
+line-height:1.7;
+flex:1;
+}
+
+.footer{
+padding:60px 0;
+text-align:center;
+color:var(--muted);
+}
+
+.button{
+margin-top:25px;
+display:inline-flex;
+align-items:center;
+justify-content:center;
+padding:13px 22px;
+border-radius:12px;
+text-decoration:none;
+background:linear-gradient(135deg,var(--accent),var(--accent2));
+color:white;
+font-weight:600;
+transition:.3s;
+}
+
+.button:hover{
+transform:scale(1.04);
+}
+
+.loader{
+padding:80px;
+text-align:center;
+color:var(--muted);
+}
+
+.fade{
+opacity:0;
+transform:translateY(25px);
+animation:fade .7s forwards;
+}
+
+@keyframes fade{
+
+to{
+opacity:1;
+transform:none;
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="hero">
+
+<div class="container fade">
+
+<h1><span>Zamwam</span></h1>
+
+<p>
+Software projects, tools, experiments, and open-source applications.
+Everything built under one GitHub account.
+</p>
+
+<div class="stats">
+
+<div class="stat">
+<h2 id="repos">-</h2>
+<p>Repositories</p>
+</div>
+
+<div class="stat">
+<h2 id="pages">-</h2>
+<p>Projects</p>
+</div>
+
+<div class="stat">
+<h2>100%</h2>
+<p>Open Source</p>
+</div>
+
+</div>
+
+<a class="button" href="https://github.com/zamwam" target="_blank">
+View GitHub
+</a>
+
+</div>
+
+</div>
+
+<section class="projects">
+
+<div class="container">
+
+<h2 class="section-title">
+Projects
+</h2>
+
+<div class="grid" id="grid">
+
+<div class="loader">
+Loading repositories...
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<div class="footer">
+© 2026 Zamwam
+</div>
+
+<script>
+
+const grid=document.getElementById("grid");
+
+fetch("https://api.github.com/users/zamwam/repos?sort=updated&per_page=100")
+.then(r=>r.json())
+.then(repos=>{
+
+document.getElementById("repos").textContent=repos.length;
+
+let pageCount=0;
+
+grid.innerHTML="";
+
+repos.forEach(repo=>{
+
+if(repo.fork) return;
+
+pageCount++;
+
+const card=document.createElement("div");
+card.className="card fade";
+
+const url=`https://zamwam.github.io/${repo.name}/`;
+
+card.innerHTML=`
+<h3>${repo.name}</h3>
+
+<p>${repo.description||"No description available."}</p>
+
+<a class="button" href="${url}" target="_blank">
+Open Project
+</a>
+`;
+
+grid.appendChild(card);
+
+});
+
+document.getElementById("pages").textContent=pageCount;
+
+});
+
+</script>
